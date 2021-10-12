@@ -16,7 +16,7 @@ def aloca_mem(job, position):
 
 
 memory_space = [0] * 128
-nucleos_processador = 1
+
 
 if __name__ == '__main__':
     job1 = jobT('job1', 5, 15, 16)
