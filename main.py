@@ -91,6 +91,7 @@ if __name__ == '__main__':
     # elif (typeProcess == "2"):  # Job mais curto
     #     jobList = sorted(jobList, key=lambda x: x.processTime)
 
+
     print("print depois")
     for item in jobList:
         print(item.name, item.arrivalTime, item.memoryReq)
