@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
     # multiProgram = getMultProgram()
     # typeProcess = getTypeProcess()
-    typeProcess = "1"
+    typeProcess = "2"
     # typeMemory = getTypeMemory()
 
     # print("multiProgram: ", multiProgram)
@@ -165,16 +165,23 @@ if __name__ == '__main__':
     # job0 = job(name, arrivalTime, processTime, memoryReq, state, memPosition)
     job0 = JobT('Partida', 0, 0, 0, 'wEntry', -1)
 
-    # job1 = jobT('job1', 50, 15, 60, 'wEntry')
-    # job2 = jobT('job2', 43, 17, 32, 'wEntry')
-    # job3 = jobT('job3', 36, 7, 64, 'wEntry')
-    # job4 = jobT('job4', 5, 23, 16, 'wEntry')
-    # job5 = jobT('job5', 200, 52, 28, 'wEntry')
-    # job6 = jobT('job6', 34, 55, 65, 'wEntry')
+    # job1 = JobT('job1', 50, 15, 60, 'wEntry')
+    # job2 = JobT('job2', 43, 17, 32, 'wEntry')
+    # job3 = JobT('job3', 36, 7, 64, 'wEntry')
+    # job4 = JobT('job4', 5, 23, 16, 'wEntry')
+    # job5 = JobT('job5', 200, 52, 28, 'wEntry')
+    # job6 = JobT('job6', 34, 55, 65, 'wEntry')
 
     job1 = JobT('job1', 10, 120, 5, 'wEntry', -1)
     job2 = JobT('job2', 15, 60, 25, 'wEntry', -1)
     job3 = JobT('job3', 30, 15, 3, 'wEntry', -1)
+
+    # jobM1 = JobT('job3', 30, 15, 3, 'wEntry', -1)
+    # jobM2 = JobT('job3', 30, 15, 3, 'wEntry', -1)
+    # jobM3 = JobT('job3', 30, 15, 3, 'wEntry', -1)
+    # jobM4 = JobT('job3', 30, 15, 3, 'wEntry', -1)
+    # jobM5 = JobT('job3', 30, 15, 3, 'wEntry', -1)
+    # jobM1 depende de jobM2
 
     job999 = JobT('Final', 249, 999, 999, 'wEntry', -1)
 
@@ -190,6 +197,9 @@ if __name__ == '__main__':
     jobExecution = []
     # 4-> 5
     jobExecutionOver = []
+
+
+    job
 
     # if (typeProcess == "1"):  # FIFO
     #     jobList = sorted(jobList, key=lambda x: x.arrivalTime)
