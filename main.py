@@ -3,7 +3,7 @@ from ME_functions import *
 import math
 
 
-class jobT(object):
+class JobT(object):
     def __init__(self, name, arrivalTime, processTime, memoryReq, state) -> None:
         super().__init__()
         self.name = name
@@ -21,14 +21,67 @@ class memoryManager(object):
         self.name = name
         self.policy = policy
 
-    def load_job(self):
-        check_max_free_space()
+    def load_job(self, job):
+        # if self.policy == 'FirstFit':
+        #     # print
+        # elif self.policy == 'BestFit':
+        #     # print
+        # elif self.policy == 'WorstFit':
+        #     # print()
+        # else
+        #     print("Politica de alocacao invalida")
+        position, space = check_max_free_space(self.policy, job)
+        print("Maior espaco encontrado:", space, "Na posicao:", position)
+        aloca_mem(job,position)
+
         # job.memoryReq
 
-def check_max_free_space():
-    for position in settings.memory_space:
-        print(position)
+def check_max_free_space(policy, job):
+    settings.memory_space[1] = 1
+    settings.memory_space[12] = 1
+    settings.memory_space[28] = 1
+    blank_count = 0
+    blank_count_max = 0
+    blank_count_position = 0
+    blank_count_position_max = 0
 
+    for (index, content) in enumerate(settings.memory_space):
+        if content == 0:
+            if blank_count == 0:
+                blank_count_position = index
+            blank_count += 1
+            if (job.memoryReq == blank_count and policy == 'FirstFit'):
+                return blank_count_position, blank_count
+        else:
+            if blank_count > blank_count_max:
+                blank_count_position_max = blank_count_position
+                blank_count_max = blank_count
+            blank_count = 0
+        # print(content, "|" , blank_count_position_max, blank_count_max)
+    return blank_count_position_max, blank_count_max
+
+"""def check_max_free_space():
+    # settings.memory_space[0] = 1
+    # settings.memory_space[15] = 1
+    # settings.memory_space[28] = 1
+    blank_count = 0
+    blank_count_max = 0
+    blank_count_position = 0
+    blank_count_position_max = 0
+
+    for (index, content) in enumerate(settings.memory_space):
+        if content == 0:
+            if blank_count == 0:
+                blank_count_position = index
+            blank_count += 1
+        else:
+            if blank_count > blank_count_max:
+                blank_count_position_max = blank_count_position
+                blank_count_max = blank_count
+            blank_count = 0
+        # print(content, "|" , blank_count_position_max, blank_count_max)
+    return blank_count_position_max, blank_count_max
+"""
 
 def imprima_lista(listToPrint, listName):
     printList = []
@@ -42,7 +95,7 @@ def handle_processor_execution():
 
     for item in jobExecution:
         item.process_job()
-        print("-- processando:", item.name,"- tempo restante:", item.processTime)
+        print("-- processando:", item.name, "- tempo restante:", item.processTime)
         # Termina o processamento do Job
         if item.processTime == 0:
             jobExecution.remove(item)
@@ -62,10 +115,10 @@ if __name__ == '__main__':
     print("typeProcess: ", typeProcess)
 
     ################################## NUMERO DE PROCESSADORES ##########################################
-    settings.number_of_processors = 3
+    settings.number_of_processors = 1
 
     # job0 = job(name, arrivalTime, processTime, memoryReq, state)
-    job0 = jobT('Partida', 0, 0, 0, 'wEntry')
+    job0 = JobT('Partida', 0, 0, 0, 'wEntry')
 
     # job1 = jobT('job1', 50, 15, 60, 'wEntry')
     # job2 = jobT('job2', 43, 17, 32, 'wEntry')
@@ -74,13 +127,14 @@ if __name__ == '__main__':
     # job5 = jobT('job5', 200, 52, 28, 'wEntry')
     # job6 = jobT('job6', 34, 55, 65, 'wEntry')
 
-    job1 = jobT('job1', 10, 120, 15, 'wEntry')
-    job2 = jobT('job2', 15, 60, 5, 'wEntry')
-    job3 = jobT('job3', 30, 15, 2, 'wEntry')
+    job1 = JobT('job1', 10, 120, 5, 'wEntry')
+    job2 = JobT('job2', 15, 60, 5, 'wEntry')
+    job3 = JobT('job3', 30, 15, 2, 'wEntry')
 
-    job999 = jobT('Final', 249, 999, 999, 'wEntry')
+    job999 = JobT('Final', 249, 999, 999, 'wEntry')
 
-    memManager = memoryManager('Gerenciador de Memoria', 'BestFit')
+    # memManager = memoryManager('Gerenciador de Memoria', 'FirstFit')
+    memManager = memoryManager('Gerenciador de Memoria', 'WorstFit')
 
     jobList = [job0, job1, job2, job3, job999]
     jobQueue = []
@@ -160,7 +214,8 @@ if __name__ == '__main__':
     # jobList[3].processTime = jobList[3].processTime -1
     # print("job4 - depois", jobList[3].name,  jobList[3].processTime)
     print("--------------------------------------------------   Final da Simulacao")
-    memManager.load_job()
+    memManager.load_job(job1)
+    memManager.garbageCollection()
     print(settings.memory_space)
 
     """
