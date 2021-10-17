@@ -4,13 +4,14 @@ import math
 
 
 class JobT(object):
-    def __init__(self, name, arrivalTime, processTime, memoryReq, state) -> None:
+    def __init__(self, name, arrivalTime, processTime, memoryReq, state, memPosition) -> None:
         super().__init__()
         self.name = name
         self.arrivalTime = arrivalTime
         self.processTime = processTime
         self.memoryReq = memoryReq
         self.state = state
+        self.memPosition = memPosition
 
     def process_job(self):
         self.processTime -= 1
@@ -32,9 +33,28 @@ class memoryManager(object):
         #     print("Politica de alocacao invalida")
         position, space = check_max_free_space(self.policy, job)
         print("Maior espaco encontrado:", space, "Na posicao:", position)
-        aloca_mem(job,position)
 
-        # job.memoryReq
+        if (job.memoryReq <= space) :
+            job.memPosition = position
+            aloca_mem(job,position)
+        else:
+            print("Nao ha memoria disponivel para alocacao")
+
+    def remove_job(self, job):
+        print("antes", settings.memory_space)
+        desaloca_mem(job)
+        jobExecutionOver.remove(job)
+        job.state = 'Job Successfully Executed!'
+        print("depois", settings.memory_space)
+
+    def allocateJob(self):
+        # PRECISA IMPLEMENTAR A VERIFICACAO DE DISPONIBILIDADE DE MEMORIA
+        # job.memoryReq len(jobQueue)
+        for (index, item) in enumerate(jobQueue):
+            # Insere o Job da Fila de Espera para a memoria: 2 -> 3
+            temp_job = jobQueue.pop(0)
+            jobReadyToProcess.append(temp_job)
+            self.load_job(temp_job)
 
 def check_max_free_space(policy, job):
     settings.memory_space[1] = 1
@@ -90,17 +110,34 @@ def imprima_lista(listToPrint, listName):
     print("Lista",listName, ":" , printList)
 
 def handle_processor_execution():
-    if len(jobQueue) and settings.number_of_processors > len(jobExecution):
-        jobExecution.append(jobQueue.pop(0))
+    if len(jobReadyToProcess) and settings.number_of_processors > len(jobExecution):
+        jobExecution.append(jobReadyToProcess.pop(0))
 
-    for item in jobExecution:
+
+    for (index, item) in enumerate(jobExecution):
+        item.process_job()
+        print("-- processando:", item.name, "- tempo restante:", item.processTime)
+
+        # Termina o processamento do Job
+        if item.processTime == 0:
+            jobExecutionOver.append(jobExecution.pop(index))
+            print("-- processamento do :", item.name, "finalizado!")
+
+
+def handle_memory_allocation():
+    print()
+
+
+
+    """for item in jobExecution:
         item.process_job()
         print("-- processando:", item.name, "- tempo restante:", item.processTime)
         # Termina o processamento do Job
         if item.processTime == 0:
-            jobExecution.remove(item)
+            # jobExecution.remove(item)
+            jobExecutionOver.append(jobExecution.pop(item))
             print("-- processamento do :", item.name, "finalizado!")
-        # print(item.name)
+        # print(item.name)"""
 
 
 if __name__ == '__main__':
@@ -117,8 +154,8 @@ if __name__ == '__main__':
     ################################## NUMERO DE PROCESSADORES ##########################################
     settings.number_of_processors = 1
 
-    # job0 = job(name, arrivalTime, processTime, memoryReq, state)
-    job0 = JobT('Partida', 0, 0, 0, 'wEntry')
+    # job0 = job(name, arrivalTime, processTime, memoryReq, state, memPosition)
+    job0 = JobT('Partida', 0, 0, 0, 'wEntry', -1)
 
     # job1 = jobT('job1', 50, 15, 60, 'wEntry')
     # job2 = jobT('job2', 43, 17, 32, 'wEntry')
@@ -127,18 +164,24 @@ if __name__ == '__main__':
     # job5 = jobT('job5', 200, 52, 28, 'wEntry')
     # job6 = jobT('job6', 34, 55, 65, 'wEntry')
 
-    job1 = JobT('job1', 10, 120, 5, 'wEntry')
-    job2 = JobT('job2', 15, 60, 5, 'wEntry')
-    job3 = JobT('job3', 30, 15, 2, 'wEntry')
+    job1 = JobT('job1', 10, 120, 5, 'wEntry', -1)
+    job2 = JobT('job2', 15, 60, 25, 'wEntry', -1)
+    job3 = JobT('job3', 30, 15, 10, 'wEntry', -1)
 
-    job999 = JobT('Final', 249, 999, 999, 'wEntry')
+    job999 = JobT('Final', 249, 999, 999, 'wEntry', -1)
 
-    # memManager = memoryManager('Gerenciador de Memoria', 'FirstFit')
-    memManager = memoryManager('Gerenciador de Memoria', 'WorstFit')
+    memManager = memoryManager('Gerenciador de Memoria', 'FirstFit')
+    # memManager = memoryManager('Gerenciador de Memoria', 'WorstFit')
 
     jobList = [job0, job1, job2, job3, job999]
+    # 2-> 3
     jobQueue = []
+    # 3-> 4
+    jobReadyToProcess = []
+    # 4
     jobExecution = []
+    # 4-> 5
+    jobExecutionOver = []
 
     # if (typeProcess == "1"):  # FIFO
     #     jobList = sorted(jobList, key=lambda x: x.arrivalTime)
@@ -158,7 +201,8 @@ if __name__ == '__main__':
         _______________________________________________________________________________________
     """
     while settings.time < 250:
-        # print("\n ------------------------------------------time", settings.time)
+        print("\n ------------------------------------------time", settings.time)
+        print(settings.memory_space)
         for item in jobList:
             if item.arrivalTime == settings.time:
                 if (item.name == 'Partida'):
@@ -184,11 +228,20 @@ if __name__ == '__main__':
          # aloca_mem(job1, positionT)
         # print(memory_space)
 
+        if len(jobQueue)> 0:
+            memManager.allocateJob()
+
         ########################################## PROCESSADOR ##########################################
-        if (len(jobQueue) + len(jobExecution)) > 0:
+        if (len(jobReadyToProcess) + len(jobExecution)) > 0:
             print("processando jobs:")
             handle_processor_execution()
             imprima_lista(jobExecution, "fila de execucao")
+
+
+        # Fim de processamento
+        for item in jobExecutionOver:
+            print("nome do job:", item.name)
+            memManager.remove_job(item)
 
 
         # for item in jobQueue:
@@ -205,18 +258,8 @@ if __name__ == '__main__':
         # print("Job em processamento:", jobC.name, "- tempo restante:", jobC.processTime)
         # jobC.process_job()
 
-
-
-
         settings.time += 1
 
-    # print("job4 - antes", jobList[3].name,  jobList[3].processTime)
-    # jobList[3].processTime = jobList[3].processTime -1
-    # print("job4 - depois", jobList[3].name,  jobList[3].processTime)
-    print("--------------------------------------------------   Final da Simulacao")
-    memManager.load_job(job1)
-    memManager.garbageCollection()
-    print(settings.memory_space)
 
     """
     # PAGINACAO DE MEMORIA

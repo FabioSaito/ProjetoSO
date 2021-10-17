@@ -2,6 +2,9 @@ import settings
 def aloca_mem(job, position):
     settings.memory_space[position:position + job.memoryReq] = [job.name] * job.memoryReq
 
+def desaloca_mem(job):
+    settings.memory_space[job.memPosition:job.memPosition + job.memoryReq] = [0] * job.memoryReq
+
 def getMultProgram():
     varMult = input("Deseja multiprogramação? (s/n) \n")
     if (varMult == "n"):
