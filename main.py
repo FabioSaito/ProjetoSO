@@ -22,6 +22,7 @@ class memoryManager(object):
         self.name = name
         self.policy = policy
 
+    # É o LOADER de fato, apenas recebe o job e insere na posicao de memoria, sem verificar nada
     def load_job(self, job):
         # if self.policy == 'FirstFit':
         #     # print
@@ -32,13 +33,10 @@ class memoryManager(object):
         # else
         #     print("Politica de alocacao invalida")
         position, space = check_max_free_space(self.policy, job)
-        print("Maior espaco encontrado:", space, "Na posicao:", position)
+        # print("Maior espaco encontrado:", space, "Na posicao:", position)
 
-        if (job.memoryReq <= space) :
-            job.memPosition = position
-            aloca_mem(job,position)
-        else:
-            print("Nao ha memoria disponivel para alocacao")
+        aloca_mem(job,position)
+
 
     def remove_job(self, job):
         print("antes", settings.memory_space)
@@ -48,18 +46,21 @@ class memoryManager(object):
         print("depois", settings.memory_space)
 
     def allocateJob(self):
-        # PRECISA IMPLEMENTAR A VERIFICACAO DE DISPONIBILIDADE DE MEMORIA
+        # PRECISA IMPLEMENTAR A VERIFICACAO DE MULTIPROGRAMACAO
         # job.memoryReq len(jobQueue)
         for (index, item) in enumerate(jobQueue):
             # Insere o Job da Fila de Espera para a memoria: 2 -> 3
-            temp_job = jobQueue.pop(0)
-            jobReadyToProcess.append(temp_job)
-            self.load_job(temp_job)
+            positionAvailable, spaceAvailable = check_max_free_space(self.policy, jobQueue[0])
+            print("espaco :", spaceAvailable, "posicao:", positionAvailable)
+            print("tam job :", jobQueue[0].memoryReq, "espaco disponivel:", spaceAvailable)
+            if (jobQueue[0].memoryReq <= spaceAvailable):
+                temp_job = jobQueue.pop(0)
+                temp_job.memPosition = positionAvailable
+                jobReadyToProcess.append(temp_job)
+                self.load_job(temp_job)
 
 def check_max_free_space(policy, job):
-    settings.memory_space[1] = 1
-    settings.memory_space[12] = 1
-    settings.memory_space[28] = 1
+
     blank_count = 0
     blank_count_max = 0
     blank_count_position = 0
@@ -77,6 +78,10 @@ def check_max_free_space(policy, job):
                 blank_count_position_max = blank_count_position
                 blank_count_max = blank_count
             blank_count = 0
+
+        if blank_count > blank_count_max:
+            blank_count_position_max = blank_count_position
+            blank_count_max = blank_count
         # print(content, "|" , blank_count_position_max, blank_count_max)
     return blank_count_position_max, blank_count_max
 
@@ -142,6 +147,9 @@ def handle_memory_allocation():
 
 if __name__ == '__main__':
     settings.init()
+    settings.memory_space[1] = 1
+    # settings.memory_space[12] = 1
+    settings.memory_space[28] = 1
 
     # multiProgram = getMultProgram()
     # typeProcess = getTypeProcess()
@@ -166,7 +174,7 @@ if __name__ == '__main__':
 
     job1 = JobT('job1', 10, 120, 5, 'wEntry', -1)
     job2 = JobT('job2', 15, 60, 25, 'wEntry', -1)
-    job3 = JobT('job3', 30, 15, 10, 'wEntry', -1)
+    job3 = JobT('job3', 30, 15, 3, 'wEntry', -1)
 
     job999 = JobT('Final', 249, 999, 999, 'wEntry', -1)
 
@@ -220,15 +228,10 @@ if __name__ == '__main__':
                 imprima_lista(jobQueue, "Fila de Espera para entrar no sistema")
 
 
-        # printaProc()
-
-        # printaProc()
-
         ########################################## LOADER ##########################################
-         # aloca_mem(job1, positionT)
-        # print(memory_space)
 
         if len(jobQueue)> 0:
+            imprima_lista(jobQueue, "memManager.allocateJob()")
             memManager.allocateJob()
 
         ########################################## PROCESSADOR ##########################################
@@ -237,8 +240,7 @@ if __name__ == '__main__':
             handle_processor_execution()
             imprima_lista(jobExecution, "fila de execucao")
 
-
-        # Fim de processamento
+        ########################################## Fim De Processamento ##########################################
         for item in jobExecutionOver:
             print("nome do job:", item.name)
             memManager.remove_job(item)
