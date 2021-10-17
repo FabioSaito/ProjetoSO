@@ -198,9 +198,6 @@ if __name__ == '__main__':
     # 4-> 5
     jobExecutionOver = []
 
-
-    job
-
     # if (typeProcess == "1"):  # FIFO
     #     jobList = sorted(jobList, key=lambda x: x.arrivalTime)
     # elif (typeProcess == "2"):  # Job mais curto
