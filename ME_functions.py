@@ -24,8 +24,8 @@ def getTypeProcess():
 def getTypeMemory():
     print("\nTipos de Alocação de Memória:")
     print("1 - Alocação Contígua Simples")
-    print("2 - Memória particionada, best-fit")
-    print("3 - Memória particionada, first-fit")
+    print("2 - Memória particionada, Worst-fit")
+    print("3 - Memória particionada, First-fit")
     # print("3 - Overlay:")
     varMemory = input("Escolha o tipo de administracao de processamento: ")
     return varMemory
